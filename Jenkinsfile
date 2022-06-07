@@ -13,8 +13,8 @@ pipeline {
     stages {
         stage('SourceCode') {
             steps {
-                git branch: 'master', 
-                url: 'https://github.com/penumallipurna/game-of-life.git'
+                git url: 'https://github.com/penumallipurna/game-of-life.git',
+                branch: 'master'
             }
         }
         stage('Build and sonarqube-analysis') {
