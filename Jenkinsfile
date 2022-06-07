@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('SourceCode') {
             steps {
-                git branch: 'sprint2_develop', 
+                git branch: 'master', 
                 url: 'https://github.com/penumallipurna/game-of-life.git'
             }
         }
