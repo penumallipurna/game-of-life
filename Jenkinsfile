@@ -1,33 +1,34 @@
-// node('jdk8') {
-//     stage('SourceCode') {
-//         git branch: 'sprint2_develop', url: 'https://github.com/penumallipurna/game-of-life.git'
-//     }
-//     stage('Package') {
-//         sh 'mvn package'
-//     }
-//     stage('Archiving and Test Results') {
-//         junit '**/surefire-reports/*.xml'
-//         archiveArtifacts artifacts: '**/*.war', followSymlinks: false
-//     }
-// }
-
 pipeline {
     agent { label 'jdk8'}
+    options { 
+        timeout(time: 1, unit: 'HOURS')
+        retry(2)
+        }
+        triggers {
+        cron('H * * * *')
+    }
+    parameters { 
+        choice(name: 'CHOICES', choices: ['compile', 'package', 'clean package']) 
+        }
     stages {
         stage('SourceCode') {
             steps {
-                git branch: 'sprint2_develop', url: 'https://github.com/penumallipurna/game-of-life.git'
+                git branch: 'sprint2_develop', 
+                url: 'https://github.com/penumallipurna/game-of-life.git'
             }
         }
-        stage('Build') {
+        stage('Build and sonarqube-analysis') {
             steps {
-               sh 'mvn package' 
+                withSonarQubeEnv('My SonarQube Server') {
+                 sh "mvn ${params.CHOICES} sonar:sonar"
+              }
+                
             }
         }
-        stage('Archiving and Test Results') {
+        stage('Test Results') {
             steps {
-               junit '**/surefire-reports/*.xml'
-               archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+               junit testResults:'**/surefire-reports/*.xml'
+              
             }
         }
     }
